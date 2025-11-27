@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dezembro Vermelho - Caça-Palavras</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>🔴 Dezembro Vermelho - Caça-Palavras 🔎</h1>
+        <p>Encontre as palavras relacionadas à prevenção do HIV/AIDS e conscientização. Use o **mouse** ou a **caixa de texto**!</p>
+    </header>
+
+    <div class="game-container">
+        <div id="word-search-grid" class="grid">
+            </div>
+
+        <div class="sidebar-container">
+            <div id="word-list" class="word-list-container">
+                <h2>Palavras para Encontrar:</h2>
+                </div>
+
+            <div class="input-area">
+                <h3>🔍 Tente Digitar a Palavra:</h3>
+                <input type="text" id="word-input" placeholder="Palavra na grade (Enter)" maxlength="15">
+                <button onclick="document.getElementById('word-input').dispatchEvent(new KeyboardEvent('keypress', {'key':'Enter'}))">Verificar Palavra</button>
+                <p id="feedback-message" class="hidden-message"></p>
+                
+                <hr> <h3>➕ Adicione Novas Palavras:</h3>
+                <input type="text" id="add-word-input" placeholder="Nova Palavra (Ex: AMOR)">
+                <button id="add-word-button">Adicionar à Lista</button>
+            </div>
+
+            <button id="reset-button" class="reset-button">🔄 Mudar Posição das Palavras</button>
+        </div>
+    </div>
+
+    <footer>
+        <p>Um jogo para conscientização. Use camisinha e faça o teste regularmente. #DezembroVermelho</p>
+    </footer>
+
+    <script src="jogo.js"></script>
+</body>
+</html>

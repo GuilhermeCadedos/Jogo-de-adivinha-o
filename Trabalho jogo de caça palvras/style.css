@@ -1,0 +1,209 @@
+:root {
+    --vermelho-dezembro: #C32828;
+    --fundo-claro: #f4f4f9;
+    --texto-escuro: #333;
+    --tamanho-celula: 30px;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: var(--fundo-claro);
+    color: var(--texto-escuro);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+header {
+    background-color: var(--vermelho-dezembro);
+    color: white;
+    padding: 20px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    margin-bottom: 5px;
+}
+
+.game-container {
+    display: flex;
+    gap: 30px;
+    margin: 20px;
+    max-width: 1000px;
+    width: 90%;
+}
+
+/* Estilo da Grade */
+.grid {
+    display: grid;
+    border: 2px solid var(--vermelho-dezembro);
+    background-color: white;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+}
+
+.cell {
+    width: var(--tamanho-celula);
+    height: var(--tamanho-celula);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.1em;
+    font-weight: bold;
+    cursor: pointer;
+    border: 1px solid #ddd;
+    user-select: none;
+}
+
+.selected {
+    background-color: #ff9999;
+    color: white;
+}
+
+.found {
+    background-color: var(--vermelho-dezembro) !important;
+    color: white;
+    transition: background-color 0.3s;
+}
+
+/* Estilo da Lista de Palavras e Sidebar */
+.sidebar-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.word-list-container {
+    background-color: white;
+    padding: 20px;
+    border: 2px solid #ccc;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+}
+
+.word-list {
+    list-style: none;
+    padding: 0;
+}
+
+.word-list li {
+    font-size: 1.2em;
+    padding: 5px 0;
+    transition: color 0.3s, text-decoration 0.3s;
+}
+
+.word-list li.found-word {
+    color: var(--vermelho-dezembro);
+    text-decoration: line-through;
+    font-weight: bold;
+}
+
+/* Estilo da Área de Digitação e Controles */
+.input-area {
+    background-color: white;
+    padding: 20px;
+    border: 2px dashed var(--vermelho-dezembro);
+    box-shadow: 0 0 10px rgba(195, 40, 40, 0.2);
+}
+
+.input-area h3 {
+    margin-top: 0;
+    color: var(--vermelho-dezembro);
+}
+
+#word-input, #add-word-input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    font-size: 1em;
+    text-transform: uppercase;
+}
+
+.input-area button {
+    background-color: var(--vermelho-dezembro);
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 1em;
+    transition: background-color 0.2s;
+}
+
+.input-area button:hover {
+    background-color: #A02020;
+}
+
+/* Estilos para o separador */
+hr {
+    border: 0;
+    height: 1px;
+    background: #ccc;
+    margin: 15px 0;
+}
+
+/* Estilos para o botão de Reset */
+.reset-button {
+    background-color: #333; /* Cinza escuro */
+    color: white;
+    border: none;
+    padding: 15px 20px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 1.1em;
+    font-weight: bold;
+    margin-top: 10px;
+    transition: background-color 0.2s;
+}
+
+.reset-button:hover {
+    background-color: #555;
+}
+
+
+/* Estilos para a mensagem de feedback */
+#feedback-message {
+    padding: 0; 
+    margin-top: 10px;
+    border-radius: 4px;
+    font-weight: bold;
+    text-align: center;
+    transition: opacity 0.3s, padding 0.3s, height 0.3s;
+    overflow: hidden;
+}
+
+.hidden-message {
+    opacity: 0;
+    height: 0;
+    padding: 0;
+}
+
+.success-message {
+    background-color: #a3ffac; 
+    color: #1a7721; 
+    opacity: 1;
+    height: auto;
+    padding: 8px;
+}
+
+.error-message {
+    background-color: #ffbaba; 
+    color: #c90000; 
+    opacity: 1;
+    height: auto;
+    padding: 8px;
+}
+
+footer {
+    width: 100%;
+    text-align: center;
+    padding: 10px;
+    margin-top: 30px;
+    background-color: #eee;
+    font-size: 0.9em;
+    color: #666;
+}
