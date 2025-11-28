@@ -2,19 +2,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- 1. CONFIGURAÇÃO INICIAL E VARIÁVEIS ---
     let BASE_WORDS = [
         'PREVENCAO', 'CAMISINHA', 'TRATAMENTO', 'TESTE', 'AIDS', 
-        'HIV', 'PRÉP', 'PEP', 'SAUDE', 'CUIDADO', 
-        'CONSCIENTIZACAO', 'VIRUS', 'CONTAMINACAO', 'SAUDESEXUAL', 'RESPEITO', 'DEZEMBRO'
-
+        'HIV', 'PRÉP', 'PEP', 'SAUDE', 'CUIDADO'
     ];
     const SECRET_WORD = 'ESPERANCA';
     const GRID_SIZE = 14; 
     
-    // Variáveis que serão atualizadas durante o jogo
     let WORDS = [];
     let gridData = [];
     let selectedCells = [];
     let isSelecting = false;
     let foundWords = new Set();
+    
+    // 🌟 NOVO: Objeto para armazenar as coordenadas (linhas e colunas) de cada palavra
+    let wordLocations = {};
     
     // Referências aos elementos HTML
     const gridElement = document.getElementById('word-search-grid');
@@ -34,6 +34,15 @@ document.addEventListener('DOMContentLoaded', () => {
         gridData = Array.from({ length: GRID_SIZE }, () => 
             Array(GRID_SIZE).fill(' ')
         );
+        wordLocations = {}; // Limpa as localizações a cada novo grid
+    }
+    
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
     }
     
     function canPlaceWord(word, r, c, dr, dc) {
@@ -51,10 +60,17 @@ document.addEventListener('DOMContentLoaded', () => {
         return true;
     }
     
-    function placeWord(word, r, c, dr, dc) {
-        for (let i = 0; i < word.length; i++) {
-            gridData[r + i * dr][c + i * dc] = word[i];
+    // 🌟 MODIFICADO: Agora armazena as coordenadas no wordLocations
+    function placeWord(originalWord, wordToPlace, r, c, dr, dc) {
+        const coords = [];
+        for (let i = 0; i < wordToPlace.length; i++) {
+            const row = r + i * dr;
+            const col = c + i * dc;
+            gridData[row][col] = wordToPlace[i];
+            coords.push({ r: row, c: col });
         }
+        // A chave é a palavra em sua forma correta/original (não invertida)
+        wordLocations[originalWord] = coords;
     }
     
     function placeWordsInGrid() {
@@ -63,8 +79,9 @@ document.addEventListener('DOMContentLoaded', () => {
             [0, 1], [1, 0], [1, 1], [0, -1], [-1, 0], [-1, -1], [-1, 1], [1, -1]
         ];
 
-        const wordsToPlace = [...WORDS, SECRET_WORD];
-        wordsToPlace.sort((a, b) => b.length - a.length);
+        let wordsToPlace = [...WORDS, SECRET_WORD];
+        wordsToPlace = shuffleArray(wordsToPlace);
+        wordsToPlace.sort((a, b) => b.length - a.length); 
 
         wordsToPlace.forEach(word => {
             const wordArray = word.split('');
@@ -79,11 +96,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 const c = Math.floor(Math.random() * GRID_SIZE);
                 const [dr, dc] = directions[Math.floor(Math.random() * directions.length)];
                 
+                // Randomiza se a palavra será colocada ao contrário
                 const finalWord = Math.random() < 0.5 ? wordArray : wordArray.reverse();
                 const wordToPlace = finalWord.join('');
 
                 if (canPlaceWord(wordToPlace, r, c, dr, dc)) {
-                    placeWord(wordToPlace, r, c, dr, dc);
+                    // Passa a palavra original e a palavra invertida (se for o caso) para placeWord
+                    placeWord(word, wordToPlace, r, c, dr, dc);
                     placed = true;
                 }
             }
@@ -119,26 +138,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 cell.addEventListener('mouseenter', continueSelection);
                 cell.addEventListener('mouseup', endSelection);
                 
-                // Marca as células se já foram encontradas antes do reset (mantém o estado visual)
-                const wordFoundList = [...foundWords].join(',');
-                if (wordFoundList.includes(gridData[r][c])) { // Simplificação: em um jogo real, precisaria de mapeamento de coordenadas
-                    // Não re-marca células, apenas as que o usuário encontrou por clique
+                // Re-aplica a classe 'found' se as coordenadas existirem em wordLocations
+                // Isso garante que palavras encontradas via input ou mouse continuem marcadas
+                const allCurrentWords = [...WORDS, SECRET_WORD];
+                for (const word of allCurrentWords) {
+                    if (foundWords.has(word) && wordLocations[word]) {
+                        for (const coord of wordLocations[word]) {
+                            if (coord.r == r && coord.c == c) {
+                                cell.classList.add('found');
+                            }
+                        }
+                    }
                 }
 
                 gridElement.appendChild(cell);
             }
         }
-        // Após renderizar, re-aplica a classe 'found' para palavras já encontradas
-         document.querySelectorAll('.cell').forEach(cell => {
-             const cellLetter = cell.textContent;
-             if ([...foundWords].some(word => word.includes(cellLetter))) { 
-                 // Isto é uma simplificação, para o jogo manter a marcação visual após o reset, 
-                 // você teria que armazenar as coordenadas de cada palavra encontrada.
-                 // Manteremos a lógica de checagem mais simples e focada no reset do estado `foundWords`.
-             }
-         });
     }
 
+    // (O restante das funções de renderização e feedback é mantido)
     function renderWordList() { 
         listElement.innerHTML = '<h2>Palavras para Encontrar:</h2>';
         const ul = document.createElement('ul');
@@ -177,12 +195,9 @@ document.addEventListener('DOMContentLoaded', () => {
             FEEDBACK_ELEMENT.classList.add('hidden-message');
         }, 3000);
     }
-
-    // --- FUNÇÕES DE INTERAÇÃO (Mouse e Digitação) ---
     
-    // ... (clearSelection, startSelection, continueSelection, endSelection) ...
-    // ... (As funções de seleção do mouse são mantidas como no script anterior) ...
-
+    // --- FUNÇÕES DE INTERAÇÃO (Mouse) ---
+    // (As funções de seleção do mouse são mantidas)
     function clearSelection() {
         document.querySelectorAll('.cell').forEach(cell => {
             if (!cell.classList.contains('found')) {
@@ -242,6 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (wordFound) {
             foundWords.add(wordFound);
             
+            // Marcar células no modo mouse
             selectedCells.forEach(cell => {
                 cell.classList.remove('selected');
                 cell.classList.add('found');
@@ -265,6 +281,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
+    // --- LÓGICA DE DIGITAÇÃO E MENSAGENS (COM MARCAÇÃO NA GRADE) ---
+
     function handleInput() {
         const inputWord = inputElement.value.toUpperCase().trim();
         
@@ -275,6 +293,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (allCurrentWords.includes(inputWord) && !foundWords.has(inputWord)) {
             
             foundWords.add(inputWord);
+
+            // 🌟 NOVO: Marcar as células na grade com base nas coordenadas
+            if (wordLocations[inputWord]) {
+                wordLocations[inputWord].forEach(coord => {
+                    const cell = document.querySelector(`.cell[data-row="${coord.r}"][data-col="${coord.c}"]`);
+                    if (cell) {
+                        cell.classList.add('found');
+                    }
+                });
+            }
 
             if (WORDS.includes(inputWord)) {
                 const listItem = document.getElementById(`word-${inputWord}`);
@@ -319,19 +347,16 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
-        // ADICIONA NO ARRAY BASE
         BASE_WORDS.push(newWord);
         showFeedback(`"${newWord}" adicionada com sucesso! Clique em "Mudar Posição das Palavras" para incluí-la na grade.`, 'success');
     }
 
     function resetGame() {
-        // Usa a lista base (incluindo as adicionadas)
         WORDS = [...BASE_WORDS]; 
         
-        foundWords.clear(); // Zera as encontradas
+        foundWords.clear(); 
         clearSelection();
         
-        // RE-EMBARALHA E COLOCA AS PALAVRAS EM NOVAS POSIÇÕES
         placeWordsInGrid(); 
         
         renderGrid();
